@@ -4,6 +4,7 @@ using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.Dto;
 using NZWalks.API.Repositories.Interfaces;
 using NZWalks.Core.Pagination;
+using NZWalks.Domain.Dtos;
 
 namespace NZWalks.API.Repositories.Implementations
 {
@@ -26,7 +27,7 @@ namespace NZWalks.API.Repositories.Implementations
         }
 
 
-        public async Task<PagedResult<Walk>> GetAllAsync(GetAllWalksQueryParameters query)
+        public async Task<PagedResult<Walk>> GetAllAsync(GetAllWalksFilter filter)
         {
             var walksQueryable = dbContext.Walks
                 .Include(x => x.Difficulty)
@@ -34,25 +35,25 @@ namespace NZWalks.API.Repositories.Implementations
                 .AsQueryable();
 
             //Filtering
-            if (string.IsNullOrWhiteSpace(query.FilterOn) == false && string.IsNullOrWhiteSpace(query.FilterQuery) == false)
+            if (string.IsNullOrWhiteSpace(filter.FilterOn) == false && string.IsNullOrWhiteSpace(filter.FilterQuery) == false)
             {
-                walksQueryable = query.FilterOn.ToLower() switch
+                walksQueryable = filter.FilterOn.ToLower() switch
                 {
-                    "name" => walksQueryable.Where(x => x.Name.Contains(query.FilterQuery)),
-                    "region" => walksQueryable.Where(x => x.Region.Name.Contains(query.FilterQuery)),
+                    "name" => walksQueryable.Where(x => x.Name.Contains(filter.FilterQuery)),
+                    "region" => walksQueryable.Where(x => x.Region.Name.Contains(filter.FilterQuery)),
                     _ => walksQueryable
                 };
             }
 
             //Sorting
-            if(string.IsNullOrWhiteSpace(query.SortBy) == false)
+            if(string.IsNullOrWhiteSpace(filter.SortBy) == false)
             {
-                walksQueryable = query.SortBy.ToLower() switch
+                walksQueryable = filter.SortBy.ToLower() switch
                 {
-                    "name" => query.IsAscending
+                    "name" => filter.IsAscending
                                 ? walksQueryable.OrderBy(x => x.Name)
                                 : walksQueryable.OrderByDescending(x => x.Name),
-                    "length" => query.IsAscending
+                    "length" => filter.IsAscending
                                 ? walksQueryable.OrderBy(x => x.LengthInKm)
                                 : walksQueryable.OrderByDescending(x => x.LengthInKm),
                     _ => walksQueryable
@@ -61,19 +62,19 @@ namespace NZWalks.API.Repositories.Implementations
 
             //Pagination
             var totalCount = await walksQueryable.CountAsync();
-            var skipResults = (query.PageNumber - 1) * query.PageSize;
+            var skipResults = (filter.PageNumber - 1) * filter.PageSize;
             var items = await walksQueryable
                 .Skip(skipResults)
-                .Take(query.PageSize)
+                .Take(filter.PageSize)
                 .ToListAsync();
-            var totalPages = (int)Math.Ceiling(totalCount / (double)query.PageSize);
+            var totalPages = (int)Math.Ceiling(totalCount / (double)filter.PageSize);
 
             return new PagedResult<Walk>
             {
                 Items = items,
                 TotalCount = totalCount,
-                PageNumber = query.PageNumber,
-                PageSize = query.PageSize,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize,
                 TotalPages = totalPages,
             };
 

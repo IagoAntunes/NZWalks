@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NZWalks.API.Repositories.Interfaces;
 using System.IdentityModel.Tokens.Jwt;

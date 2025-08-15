@@ -5,6 +5,7 @@ using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.Dto;
 using NZWalks.API.Repositories.Interfaces;
 using NZWalks.Core.Pagination;
+using NZWalks.Domain.Dtos;
 
 namespace NZWalks.API.Controllers
 {
@@ -29,10 +30,10 @@ namespace NZWalks.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] GetAllWalksQueryParameters query)
         {
-            var result = await walkRepository.GetAllAsync(query);
+            var walkFilters = mapper.Map<GetAllWalksFilter>(query);
+            var result = await walkRepository.GetAllAsync(walkFilters);
 
             var dtoItems = mapper.Map<List<WalkDto>>(result.Items);
-            
 
             var response = new PagedResult<WalkDto>
             {

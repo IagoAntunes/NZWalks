@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Models.Dto;
 using NZWalks.API.Repositories.Interfaces;
+using NZWalks.Domain.Dtos;
 
 namespace NZWalks.API.Controllers
 {
@@ -11,12 +11,15 @@ namespace NZWalks.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository authRepository;
+        private readonly IMapper mapper;
 
         public AuthController(
-            IAuthRepository authRepository
+            IAuthRepository authRepository,
+            IMapper mapper
         )
         {
             this.authRepository = authRepository;
+            this.mapper = mapper;
         }
 
 
@@ -25,7 +28,8 @@ namespace NZWalks.API.Controllers
         [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
-            var result = await authRepository.Register(request);
+            var registerDto = mapper.Map<RegisterDto>(request);
+            var result = await authRepository.Register(registerDto);
 
             if(result == true)
             {
@@ -40,7 +44,8 @@ namespace NZWalks.API.Controllers
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
-            var result = await authRepository.Login(request);
+            var loginDto = mapper.Map<LoginDto>(request);
+            var result = await authRepository.Login(loginDto);
             if(result != null)
             {
                 var response = new LoginResponseDto

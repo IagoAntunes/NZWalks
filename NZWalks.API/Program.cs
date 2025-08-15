@@ -6,9 +6,11 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NZWalks.API.Data;
+using NZWalks.API.Mapping;
 using NZWalks.API.Mappings;
 using NZWalks.API.Repositories.Implementations;
 using NZWalks.API.Repositories.Interfaces;
+using NZWalks.Infrastructure;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,31 +55,12 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddDbContext<NZWalksDbContext>(
-   options => options.UseSqlServer(
-        builder.Configuration.GetConnectionString("NZWalksConnectionString")   
-    )     
-);
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
-builder.Services.AddDbContext<NZWalksAuthDbContext>(
-   options => options.UseSqlServer(
-        builder.Configuration.GetConnectionString("NZWalksAuthConnectionString")
-    )
-);
-
-builder.Services.AddScoped<IRegionRepository,SQLRegionRepository>();
-builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
-builder.Services.AddScoped<ITokenRepository, TokenRepository>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<IImageRepository, LocalImageRepository>();
-
-builder.Services.AddAutoMapper(cgf =>{cgf.AddProfile<AutoMapperProfiles>();});
-
-builder.Services.AddIdentityCore<IdentityUser>()
-    .AddRoles<IdentityRole>()
-    .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("NZWalks")
-    .AddEntityFrameworkStores<NZWalksAuthDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddAutoMapper(cgf =>{
+    cgf.AddProfile<RequestToDtoMapper>();
+    cgf.AddProfile<DtoToEntityMapper>();
+});
 
 builder.Services.Configure<IdentityOptions>(options =>
 {

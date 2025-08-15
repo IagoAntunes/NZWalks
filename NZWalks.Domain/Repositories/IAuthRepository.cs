@@ -1,12 +1,11 @@
 ﻿using NZWalks.API.Models.Dto;
+using NZWalks.Domain.Dtos;
 
 namespace NZWalks.API.Repositories.Interfaces
 {
     public interface IAuthRepository
     {
-
-        Task<bool> Register(RegisterRequestDto request);
-        Task<string?> Login(LoginRequestDto request);
-
+        Task<bool> Register(RegisterDto registerDto);
+        Task<string?> Login(LoginDto loginDto);
     }
 }

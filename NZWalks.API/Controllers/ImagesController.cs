@@ -10,10 +10,15 @@ namespace NZWalks.API.Controllers
     [ApiController]
     public class ImagesController : ControllerBase
     {
+        private readonly ImageService service;
         private readonly IImageRepository repository;
 
-        public ImagesController(IImageRepository repository)
+        public ImagesController(
+            ImageService service,
+            IImageRepository repository
+        )
         {
+            this.service = service;
             this.repository = repository;
         }
 
@@ -28,16 +33,22 @@ namespace NZWalks.API.Controllers
             {
                 var imageDomainModel = new Image
                 {
-                    File = request.File,
                     FileExtension = Path.GetExtension(request.File.FileName),
                     FileSizeInBytes = request.File.Length,
                     FileName = request.FileName,
                     FileDescription = request.FileDescription,
                 };
 
-                await repository.Upload(imageDomainModel);
-
-                return Ok(imageDomainModel);
+                var imageCreated = await service.CreateImage(imageDomainModel,request.File);
+                if (imageCreated)
+                {
+                    await repository.Upload(imageDomainModel);
+                    return Ok(imageDomainModel);
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
 
             return BadRequest(ModelState);

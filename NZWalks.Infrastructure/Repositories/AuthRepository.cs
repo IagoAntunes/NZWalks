@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using NZWalks.API.Models.Dto;
 using NZWalks.API.Repositories.Interfaces;
+using NZWalks.Domain.Dtos;
 
 namespace NZWalks.API.Repositories.Implementations
 {
@@ -19,23 +20,23 @@ namespace NZWalks.API.Repositories.Implementations
             this.tokenRepository = tokenRepository;
         }
 
-        public async Task<string?> Login(LoginRequestDto request)
+        public async Task<string?> Login(LoginDto loginDto)
         {
-            var user = await userManager.FindByEmailAsync(request.Username);
+            var user = await userManager.FindByEmailAsync(loginDto.Username);
 
             if (user != null)
             {
-                var passwordIsCorrect = await userManager.CheckPasswordAsync(user, request.Password);
+                var passwordIsCorrect = await userManager.CheckPasswordAsync(user, loginDto.Password);
                 if (passwordIsCorrect)
                 {
                     var roles = await userManager.GetRolesAsync(user);
                     if (roles != null)
                     {
                         var jwtToken = tokenRepository.CreateJWTToken(user, roles.ToList());
-                        var response = new LoginResponseDto
-                        {
-                            JwtToken = jwtToken,
-                        };
+                        //var response = new LoginResponseDto
+                        //{
+                        //    JwtToken = jwtToken,
+                        //};
                         return jwtToken;
                     }
                 }
@@ -43,19 +44,19 @@ namespace NZWalks.API.Repositories.Implementations
             return null;
         }
 
-        public async Task<bool> Register(RegisterRequestDto request)
+        public async Task<bool> Register(RegisterDto registerDto)
         {
             var identityUser = new IdentityUser
             {
-                UserName = request.Username,
-                Email = request.Username,
+                UserName = registerDto.Username,
+                Email = registerDto.Username,
             };
-            var identityResult = await userManager.CreateAsync(identityUser, request.Password);
+            var identityResult = await userManager.CreateAsync(identityUser, registerDto.Password);
             if (identityResult.Succeeded)
             {
-                if (request.Roles != null && request.Roles.Any())
+                if (registerDto.Roles != null && registerDto.Roles.Any())
                 {
-                    identityResult = await userManager.AddToRolesAsync(identityUser, request.Roles);
+                    identityResult = await userManager.AddToRolesAsync(identityUser, registerDto.Roles);
                     if (identityResult.Succeeded)
                     {
                         return true;
