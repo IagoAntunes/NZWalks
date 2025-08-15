@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NZWalks.API.CustomActionFilters;
-using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.Dto;
-using NZWalks.API.Repositories;
-using System;
+using NZWalks.API.Repositories.Interfaces;
 
 namespace NZWalks.API.Controllers
 {
@@ -17,17 +13,14 @@ namespace NZWalks.API.Controllers
     [Authorize]
     public class RegionsController : ControllerBase
     {
-        private readonly NZWalksDbContext dbContext;
         private readonly IMapper mapper;
         private readonly IRegionRepository regionRepository;
 
         public RegionsController(
-            NZWalksDbContext dbContext,
             IMapper mapper,
             IRegionRepository regionRepository
         )
         {
-            this.dbContext = dbContext;
             this.mapper = mapper;
             this.regionRepository = regionRepository;
         }
@@ -36,6 +29,7 @@ namespace NZWalks.API.Controllers
         // GET ALL REGIONS
         //GET: https://localhost:portnumber/api/regions
         [HttpGet]
+        [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAll()
         {
             var regionsDomain = await regionRepository.GetAllAsync();
@@ -49,6 +43,7 @@ namespace NZWalks.API.Controllers
         //GET: https://localhost:portnumber/api/regions/{id}
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var regionDomain = await regionRepository.GetById(id);
@@ -67,6 +62,7 @@ namespace NZWalks.API.Controllers
         // POST: https://localhost:portnumber/api/regions
         [HttpPost]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto request)
         {
             var createdRegion = mapper.Map<Region>(request);
@@ -82,6 +78,7 @@ namespace NZWalks.API.Controllers
         [HttpPut]
         [Route("{id:Guid}")]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRequest)
         {
             var regionDomainModel = mapper.Map<Region>(updateRequest);
@@ -103,6 +100,7 @@ namespace NZWalks.API.Controllers
         // DELETE: https://localhost:portnumber/api/regions/{id}
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var region = await regionRepository.DeleteAsync(id);

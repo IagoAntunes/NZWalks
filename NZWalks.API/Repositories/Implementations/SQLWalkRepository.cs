@@ -2,9 +2,10 @@
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.Dto;
+using NZWalks.API.Repositories.Interfaces;
 using NZWalks.Core.Pagination;
 
-namespace NZWalks.API.Repositories
+namespace NZWalks.API.Repositories.Implementations
 {
     public class SQLWalkRepository : IWalkRepository
     {

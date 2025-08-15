@@ -2,7 +2,7 @@
 using NZWalks.API.Models.Dto;
 using NZWalks.Core.Pagination;
 
-namespace NZWalks.API.Repositories
+namespace NZWalks.API.Repositories.Interfaces
 {
     public interface IWalkRepository
     {

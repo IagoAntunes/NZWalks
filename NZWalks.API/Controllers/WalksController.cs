@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.CustomActionFilters;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.Dto;
-using NZWalks.API.Repositories;
+using NZWalks.API.Repositories.Interfaces;
 using NZWalks.Core.Pagination;
 
 namespace NZWalks.API.Controllers
