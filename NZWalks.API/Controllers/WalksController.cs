@@ -32,6 +32,7 @@ namespace NZWalks.API.Controllers
             var result = await walkRepository.GetAllAsync(query);
 
             var dtoItems = mapper.Map<List<WalkDto>>(result.Items);
+            
 
             var response = new PagedResult<WalkDto>
             {
