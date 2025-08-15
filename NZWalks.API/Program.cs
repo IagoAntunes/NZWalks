@@ -20,6 +20,7 @@ builder.Services.AddDbContext<NZWalksDbContext>(
 );
 
 builder.Services.AddScoped<IRegionRepository,SQLRegionRepository>();
+builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
 
 
 builder.Services.AddAutoMapper(cgf =>{cgf.AddProfile<AutoMapperProfiles>();});
